@@ -17,100 +17,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
- // First, initialize Finsweet attributes
+ // Wait for Finsweet CMS to be ready
 window.fsAttributes = window.fsAttributes || [];
 window.fsAttributes.push([
   'cmsfilter',
   (filterInstances) => {
-    // Get the main filter instance
-    const filterInstance = filterInstances[0];
+    // Now that filters are ready, set up animations
     
-    // Initial setup - items start hidden but will be made visible
-    const allItems = document.querySelectorAll('.portfolio_item, .inputs_item-link');
-    
-    // Set initial states
-    gsap.set(allItems, {
-      opacity: 0,
-      y: 30
-    });
-    
+    // Set initial scale for portfolio images
     gsap.set('.portfolio_image_inner, .tour-card_image_inner', {
       scale: 1.1
     });
     
-    // Function to animate items
-    function animateItems(items) {
-      items.forEach((item, index) => {
-        // Make sure the item is marked as visible
-        item.classList.add('is-visible');
-        
-        // Animate the item
-        gsap.to(item, {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          delay: index * 0.1,
-          clearProps: "transform" // Important for Finsweet to work properly
-        });
-        
-        // Animate the portfolio image scale
-        const imageInner = item.querySelector('.portfolio_image_inner, .tour-card_image_inner');
-        if (imageInner) {
-          gsap.to(imageInner, {
-            scale: 1,
-            duration: 2,
-            ease: 'power2.out',
-            delay: index * 0.1
-          });
-        }
+    // Initial state - but only apply to items in viewport
+    const items = document.querySelectorAll('.portfolio_item, .inputs_item-link');
+    
+    items.forEach((item, index) => {
+      // First make all items visible for filtering
+      gsap.set(item, { 
+        opacity: 1,
+        y: 0
       });
-    }
-    
-    // Initial animation of all visible items on page load
-    const initialItems = Array.from(allItems).filter(item => {
-      const rect = item.getBoundingClientRect();
-      return rect.top < window.innerHeight; // Only animate items in initial viewport
-    });
-    
-    // Animate initial items
-    animateItems(initialItems);
-    
-    // Set up scroll animations for remaining items
-    allItems.forEach(item => {
-      if (!initialItems.includes(item)) {
-        ScrollTrigger.create({
-          trigger: item,
-          start: 'top 80%',
-          onEnter: () => {
-            animateItems([item]);
-          },
-          once: true
-        });
-      }
-    });
-    
-    // CRITICAL: Listen for filter changes and animate filtered items
-    filterInstance.listInstance.on('renderitems', () => {
-      // Get currently visible filtered items
-      const filteredItems = Array.from(allItems).filter(item => {
-        // Check for Finsweet's hidden class
-        return !item.classList.contains('w-dyn-hide') && 
-               !item.classList.contains('hide') &&
-               window.getComputedStyle(item).display !== 'none';
-      });
+      item.classList.add('is-visible');
       
-      // Reset opacity for newly filtered items
-      filteredItems.forEach(item => {
-        if (!item.classList.contains('is-visible')) {
-          gsap.set(item, {
-            opacity: 0,
-            y: 30
-          });
-        }
+      // Then set up scroll animation for image scale only
+      ScrollTrigger.create({
+        trigger: item,
+        start: 'top 30%',
+        onEnter: () => {
+          // Only animate the image scale, not the visibility
+          const imageInner = item.querySelector('.portfolio_image_inner, .tour-card_image_inner');
+          if (imageInner) {
+            gsap.to(imageInner, {
+              scale: 1,
+              duration: 3,
+              ease: 'power2.out',
+              delay: index * 0.1
+            });
+          }
+        },
+        once: true
       });
-      
-      // Animate the filtered items
-      animateItems(filteredItems);
     });
   }
 ]);
