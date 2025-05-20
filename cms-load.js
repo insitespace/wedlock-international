@@ -1,9 +1,6 @@
-// Set initial scale for portfolio images
-  gsap.set('.portfolio_image_inner', {
-    scale: 1.1
-  });
-
-  // Create animation with ScrollTrigger
+document.addEventListener('DOMContentLoaded', function () {
+  
+  // Animate portfolio items on scroll
   const items = document.querySelectorAll('.portfolio_item, .inputs_item-link');
   items.forEach((item, index) => {
     ScrollTrigger.create({
@@ -29,6 +26,7 @@
           });
         }
       },
-      once: true // Added to ensure animation only happens once
+      once: true
     });
   });
+});
