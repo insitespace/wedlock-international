@@ -17,50 +17,60 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
- // Wait for Finsweet CMS to be ready
-window.fsAttributes = window.fsAttributes || [];
-window.fsAttributes.push([
-  'cmsfilter',
-  (filterInstances) => {
-    // Now that filters are ready, set up animations
-    
-    // Set initial scale for portfolio images
-    gsap.set('.portfolio_image_inner, .tour-card_image_inner', {
-      scale: 1.1
+ function animatePortfolioItems() {
+  const items = document.querySelectorAll('.portfolio_item, .inputs_item-link');
+
+  // Set initial state
+  gsap.set(items, {
+    opacity: 0,
+    y: 30
+  });
+
+  // Set initial scale for portfolio images
+  gsap.set('.portfolio_image_inner, .tour-card_image_inner', {
+    scale: 1.1
+  });
+
+  items.forEach((item, index) => {
+    ScrollTrigger.create({
+      trigger: item,
+      start: 'top 80%',
+      onEnter: () => {
+        item.classList.add('is-visible');
+        gsap.to(item, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          delay: index * 0.1
+        });
+
+        const imageInner = item.querySelector('.portfolio_image_inner, .tour-card_image_inner');
+        if (imageInner) {
+          gsap.to(imageInner, {
+            scale: 1,
+            duration: 3,
+            ease: 'power2.out',
+            delay: index * 0.1
+          });
+        }
+      },
+      once: true
     });
-    
-    // Initial state - but only apply to items in viewport
-    const items = document.querySelectorAll('.portfolio_item, .inputs_item-link');
-    
-    items.forEach((item, index) => {
-      // First make all items visible for filtering
-      gsap.set(item, { 
-        opacity: 1,
-        y: 0
-      });
-      item.classList.add('is-visible');
-      
-      // Then set up scroll animation for image scale only
-      ScrollTrigger.create({
-        trigger: item,
-        start: 'top 30%',
-        onEnter: () => {
-          // Only animate the image scale, not the visibility
-          const imageInner = item.querySelector('.portfolio_image_inner, .tour-card_image_inner');
-          if (imageInner) {
-            gsap.to(imageInner, {
-              scale: 1,
-              duration: 3,
-              ease: 'power2.out',
-              delay: index * 0.1
-            });
-          }
-        },
-        once: true
-      });
-    });
-  }
-]);
+  });
+}
+
+// Initial run
+animatePortfolioItems();
+
+// Re-run animation after filtering
+document.addEventListener('fs-cmsfilter-complete', () => {
+  // Kill existing triggers if needed
+  ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+
+  // Re-run the animation setup
+  animatePortfolioItems();
+});
+
   // Call the animateNavLinks function when .fs-navbar_menu-button is clicked
   const fsNavbarMenuButton = document.querySelector('.fs-navbar_menu-button');
   fsNavbarMenuButton.addEventListener('click', animateNavLinks);
