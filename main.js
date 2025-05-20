@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
   items.forEach((item, index) => {
     ScrollTrigger.create({
       trigger: item,
-      start: 'top 20%',
+      start: 'top 80%',
       onEnter: () => {
         item.classList.add('is-visible');
         gsap.to(item, {
