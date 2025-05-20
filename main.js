@@ -17,10 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
- function animatePortfolioItems() {
+ function animatePortfolioItems(enableScrollTrigger = true) {
   const items = document.querySelectorAll('.portfolio_item, .inputs_item-link');
 
-  // Set initial state
+  // Reset styles
   gsap.set(items, {
     opacity: 0,
     y: 30
@@ -31,57 +31,57 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   items.forEach((item, index) => {
-    const trigger = ScrollTrigger.create({
-      trigger: item,
-      start: 'top 80%',
-      onEnter: () => {
-        item.classList.add('is-visible');
-
-        gsap.to(item, {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          delay: index * 0.1
-        });
-
-        const imageInner = item.querySelector('.portfolio_image_inner, .tour-card_image_inner');
-        if (imageInner) {
-          gsap.to(imageInner, {
-            scale: 1,
-            duration: 3,
-            ease: 'power2.out',
-            delay: index * 0.1
-          });
-        }
-      },
-      once: true
-    });
-
-    // 👉 If item is already in view, trigger animation immediately
-    if (isInViewport(item)) {
-      trigger.animation?.progress(1); // force progress if needed
-      trigger.callback?.(); // trigger the callback manually
+    if (enableScrollTrigger) {
+      // Use ScrollTrigger on first load
+      ScrollTrigger.create({
+        trigger: item,
+        start: 'top 80%',
+        onEnter: () => {
+          animateItem(item, index);
+        },
+        once: true
+      });
+    } else {
+      // Skip ScrollTrigger — animate immediately
+      animateItem(item, index, true);
     }
   });
 }
 
-// Utility to check if an element is already in viewport
-function isInViewport(el) {
-  const rect = el.getBoundingClientRect();
-  return (
-    rect.top < window.innerHeight &&
-    rect.bottom > 0
-  );
+// Animation helper
+function animateItem(item, index, immediate = false) {
+  item.classList.add('is-visible');
+
+  gsap.to(item, {
+    opacity: 1,
+    y: 0,
+    duration: 0.6,
+    delay: immediate ? 0 : index * 0.1
+  });
+
+  const imageInner = item.querySelector('.portfolio_image_inner, .tour-card_image_inner');
+  if (imageInner) {
+    gsap.to(imageInner, {
+      scale: 1,
+      duration: 3,
+      ease: 'power2.out',
+      delay: immediate ? 0 : index * 0.1
+    });
+  }
 }
 
-// Initial run
-animatePortfolioItems();
+// Run on initial load (with ScrollTrigger)
+animatePortfolioItems(true);
 
-// Re-run after filtering
+// Disable ScrollTrigger after filtering
 document.addEventListener('fs-cmsfilter-complete', () => {
+  // Kill any existing triggers
   ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-  animatePortfolioItems();
+
+  // Re-run without ScrollTrigger — show immediately
+  animatePortfolioItems(false);
 });
+
 
 
   // Select the nav link items
