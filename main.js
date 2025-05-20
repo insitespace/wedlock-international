@@ -71,6 +71,39 @@ document.addEventListener('fs-cmsfilter-complete', () => {
   animatePortfolioItems();
 });
 
+  // Select the nav link items
+  const navLinks = document.querySelectorAll('.fs-menu-link, .fs-navbar_wrap');
+  let isMenuOpen = false;
+
+  // Set initial properties for the nav link items
+  gsap.set(navLinks, { opacity: .5, y: 100 });
+
+  // Function to animate nav link items with a delay
+  function animateNavLinks() {
+    if (!isMenuOpen) {
+      gsap.to(navLinks, {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        stagger: 0.02,
+        ease: 'power2.out',
+        delay: 0.4, // Delay the animation by 1.5 seconds
+      });
+      isMenuOpen = true;
+    } else {
+      gsap.to(navLinks, {
+        opacity: .5,
+        y: 100,
+        duration: 0.4,
+        stagger: 0.02,
+        ease: 'power2.out',
+        onComplete: () => {
+          isMenuOpen = false;
+        },
+      });
+    }
+  }
+
   // Call the animateNavLinks function when .fs-navbar_menu-button is clicked
   const fsNavbarMenuButton = document.querySelector('.fs-navbar_menu-button');
   fsNavbarMenuButton.addEventListener('click', animateNavLinks);
@@ -179,3 +212,4 @@ document.addEventListener('fs-cmsfilter-complete', () => {
   // Initialize the animations
   initNavDropdowns();
 });
+
