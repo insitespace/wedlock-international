@@ -43,7 +43,7 @@ window.fsAttributes.push([
       // Then set up scroll animation for image scale only
       ScrollTrigger.create({
         trigger: item,
-        start: 'top 40%',
+        start: 'top 30%',
         onEnter: () => {
           // Only animate the image scale, not the visibility
           const imageInner = item.querySelector('.portfolio_image_inner, .tour-card_image_inner');
