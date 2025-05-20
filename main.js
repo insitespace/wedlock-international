@@ -17,69 +17,77 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
- function animatePortfolioItems(enableScrollTrigger = true) {
+ function animatePortfolioItems({ useScrollTrigger = true } = {}) {
   const items = document.querySelectorAll('.portfolio_item, .inputs_item-link');
 
-  // Reset styles
-  gsap.set(items, {
-    opacity: 0,
-    y: 30
-  });
+  if (!items.length) return;
 
-  gsap.set('.portfolio_image_inner, .tour-card_image_inner', {
-    scale: 1.1
-  });
+  // Kill existing triggers (important if called after filtering)
+  ScrollTrigger.getAll().forEach(trigger => trigger.kill());
 
   items.forEach((item, index) => {
-    if (enableScrollTrigger) {
-      // Use ScrollTrigger on first load
+    // Reset initial styles
+    gsap.set(item, {
+      opacity: 0,
+      y: 30
+    });
+
+    const imageInner = item.querySelector('.portfolio_image_inner, .tour-card_image_inner');
+    if (imageInner) {
+      gsap.set(imageInner, { scale: 1.1 });
+    }
+
+    if (useScrollTrigger) {
+      // Animate with scroll
       ScrollTrigger.create({
         trigger: item,
         start: 'top 80%',
+        once: true,
         onEnter: () => {
-          animateItem(item, index);
-        },
-        once: true
+          item.classList.add('is-visible');
+          gsap.to(item, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            delay: index * 0.1
+          });
+
+          if (imageInner) {
+            gsap.to(imageInner, {
+              scale: 1,
+              duration: 3,
+              ease: 'power2.out',
+              delay: index * 0.1
+            });
+          }
+        }
       });
     } else {
-      // Skip ScrollTrigger — animate immediately
-      animateItem(item, index, true);
+      // Skip animation — show instantly
+      item.classList.add('is-visible');
+      gsap.set(item, {
+        opacity: 1,
+        y: 0
+      });
+
+      if (imageInner) {
+        gsap.set(imageInner, {
+          scale: 1
+        });
+      }
     }
   });
+
+  // Refresh ScrollTrigger just in case
+  if (useScrollTrigger) ScrollTrigger.refresh();
 }
 
-// Animation helper
-function animateItem(item, index, immediate = false) {
-  item.classList.add('is-visible');
+// ✅ 1. Animate with ScrollTrigger on first load
+animatePortfolioItems({ useScrollTrigger: true });
 
-  gsap.to(item, {
-    opacity: 1,
-    y: 0,
-    duration: 0.6,
-    delay: immediate ? 0 : index * 0.1
-  });
-
-  const imageInner = item.querySelector('.portfolio_image_inner, .tour-card_image_inner');
-  if (imageInner) {
-    gsap.to(imageInner, {
-      scale: 1,
-      duration: 3,
-      ease: 'power2.out',
-      delay: immediate ? 0 : index * 0.1
-    });
-  }
-}
-
-// Run on initial load (with ScrollTrigger)
-animatePortfolioItems(true);
-
-// Disable ScrollTrigger after filtering
+// ✅ 2. Disable animations after CMS filtering
 document.addEventListener('fs-cmsfilter-complete', () => {
-  // Kill any existing triggers
-  ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-
-  // Re-run without ScrollTrigger — show immediately
-  animatePortfolioItems(false);
+  animatePortfolioItems({ useScrollTrigger: false });
 });
 
 
