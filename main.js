@@ -17,66 +17,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Wait for Finsweet CMS to be ready
+ // Wait for Finsweet CMS to be ready
 window.fsAttributes = window.fsAttributes || [];
 window.fsAttributes.push([
   'cmsfilter',
   (filterInstances) => {
-    // Animate filtered items when filter changes
-    filterInstances.forEach(filter => {
-      filter.listInstance.on('renderitems', (renderedItems) => {
-        // Animate newly rendered items
-        renderedItems.forEach((item, index) => {
-          // Reset any previous animations
-          gsap.set(item.element, { 
-            opacity: 0,
-            y: 30
-          });
-          
-          // Animate in with stagger
-          gsap.to(item.element, {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            delay: index * 0.05,
-            ease: 'power2.out'
-          });
-          
-          // Animate image inner
-          const imageInner = item.element.querySelector('.portfolio_image_inner, .tour-card_image_inner');
-          if (imageInner) {
-            gsap.set(imageInner, { scale: 1.1 });
-            gsap.to(imageInner, {
-              scale: 1,
-              duration: 2,
-              ease: 'power2.out',
-              delay: index * 0.05
-            });
-          }
-        });
-      });
+    // Now that filters are ready, set up animations
+    
+    // Set initial scale for portfolio images
+    gsap.set('.portfolio_image_inner, .tour-card_image_inner', {
+      scale: 1.1
     });
     
-    // Initial animation for all items on page load
+    // Initial state - but only apply to items in viewport
     const items = document.querySelectorAll('.portfolio_item, .inputs_item-link');
+    
     items.forEach((item, index) => {
-      item.classList.add('is-visible');
-      gsap.to(item, {
+      // First make all items visible for filtering
+      gsap.set(item, { 
         opacity: 1,
-        y: 0,
-        duration: 0.6,
-        delay: index * 0.1
+        y: 0
       });
+      item.classList.add('is-visible');
       
-      const imageInner = item.querySelector('.portfolio_image_inner, .tour-card_image_inner');
-      if (imageInner) {
-        gsap.to(imageInner, {
-          scale: 1,
-          duration: 3,
-          ease: 'power2.out',
-          delay: index * 0.1
-        });
-      }
+      // Then set up scroll animation for image scale only
+      ScrollTrigger.create({
+        trigger: item,
+        start: 'top 80%',
+        onEnter: () => {
+          // Only animate the image scale, not the visibility
+          const imageInner = item.querySelector('.portfolio_image_inner, .tour-card_image_inner');
+          if (imageInner) {
+            gsap.to(imageInner, {
+              scale: 1,
+              duration: 3,
+              ease: 'power2.out',
+              delay: index * 0.1
+            });
+          }
+        },
+        once: true
+      });
     });
   }
 ]);
