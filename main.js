@@ -26,17 +26,17 @@ document.addEventListener('DOMContentLoaded', () => {
     y: 30
   });
 
-  // Set initial scale for portfolio images
   gsap.set('.portfolio_image_inner, .tour-card_image_inner', {
     scale: 1.1
   });
 
   items.forEach((item, index) => {
-    ScrollTrigger.create({
+    const trigger = ScrollTrigger.create({
       trigger: item,
       start: 'top 80%',
       onEnter: () => {
         item.classList.add('is-visible');
+
         gsap.to(item, {
           opacity: 1,
           y: 0,
@@ -56,20 +56,33 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       once: true
     });
+
+    // 👉 If item is already in view, trigger animation immediately
+    if (isInViewport(item)) {
+      trigger.animation?.progress(1); // force progress if needed
+      trigger.callback?.(); // trigger the callback manually
+    }
   });
+}
+
+// Utility to check if an element is already in viewport
+function isInViewport(el) {
+  const rect = el.getBoundingClientRect();
+  return (
+    rect.top < window.innerHeight &&
+    rect.bottom > 0
+  );
 }
 
 // Initial run
 animatePortfolioItems();
 
-// Re-run animation after filtering
+// Re-run after filtering
 document.addEventListener('fs-cmsfilter-complete', () => {
-  // Kill existing triggers if needed
   ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-
-  // Re-run the animation setup
   animatePortfolioItems();
 });
+
 
   // Select the nav link items
   const navLinks = document.querySelectorAll('.fs-menu-link, .fs-navbar_wrap');
