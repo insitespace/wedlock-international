@@ -80,6 +80,7 @@ window.fsAttributes.push([
     });
   }
 ]);
+  
   // Select the nav link items
   const navLinks = document.querySelectorAll('.fs-menu-link, .fs-navbar_wrap');
   let isMenuOpen = false;
