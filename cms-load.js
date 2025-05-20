@@ -1,6 +1,16 @@
-document.addEventListener('DOMContentLoaded', function () {
-  
-  // Animate portfolio items on scroll
+document.addEventListener('DOMContentLoaded', () => {
+  // Set initial state immediately
+  gsap.set('.portfolio_item, .inputs_item-link', {
+    opacity: 0,
+    y: 30
+  });
+
+  // Set initial scale for portfolio images
+  gsap.set('.portfolio_image_inner', {
+    scale: 1.1
+  });
+
+  // Create animation with ScrollTrigger
   const items = document.querySelectorAll('.portfolio_item, .inputs_item-link');
   items.forEach((item, index) => {
     ScrollTrigger.create({
@@ -26,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
           });
         }
       },
-      once: true
+      once: true // Animation only runs once
     });
   });
 });
