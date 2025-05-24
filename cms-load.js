@@ -38,3 +38,4 @@ items.forEach((item, index) => {
     once: true // Animation only runs once
   });
 });
+
