@@ -69,40 +69,43 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }, 700);
 
-  // Select the nav link items
-  const navLinks = document.querySelectorAll('.fs-menu-link, .fs-navbar_wrap');
-  let isMenuOpen = false;
+  // Nav link animation code
+  window.isMenuOpen = false; // Global flag to be used across scripts
 
-  // Set initial properties for the nav link items
-  gsap.set(navLinks, { opacity: .5, y: 100 });
+  window.Webflow ||= [];
+  window.Webflow.push(() => {
+    const navLinks = document.querySelectorAll('.fs-menu-link, .fs-navbar_wrap');
+    const fsNavbarMenuButton = document.querySelector('.fs-navbar_menu-button');
 
-  // Function to animate nav link items with a delay
-  function animateNavLinks() {
-    if (!isMenuOpen) {
-      gsap.to(navLinks, {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        stagger: 0.02,
-        ease: 'power2.out',
-        delay: 0.4, // Delay the animation by 1.5 seconds
-      });
-      isMenuOpen = true;
-    } else {
-      gsap.to(navLinks, {
-        opacity: .5,
-        y: 100,
-        duration: 0.4,
-        stagger: 0.02,
-        ease: 'power2.out',
-        onComplete: () => {
-          isMenuOpen = false;
-        },
-      });
+    if (navLinks.length && fsNavbarMenuButton) {
+      gsap.set(navLinks, { opacity: 0.5, y: 100 });
+
+      function animateNavLinks() {
+        if (!window.isMenuOpen) {
+          gsap.to(navLinks, {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            stagger: 0.02,
+            ease: 'power2.out',
+            delay: 0.4
+          });
+          window.isMenuOpen = true;
+        } else {
+          gsap.to(navLinks, {
+            opacity: 0.5,
+            y: 100,
+            duration: 0.4,
+            stagger: 0.02,
+            ease: 'power2.out',
+            onComplete: () => {
+              window.isMenuOpen = false;
+            }
+          });
+        }
+      }
+
+      fsNavbarMenuButton.addEventListener('click', animateNavLinks);
     }
-  }
-
-  // Call the animateNavLinks function when .fs-navbar_menu-button is clicked
-  const fsNavbarMenuButton = document.querySelector('.fs-navbar_menu-button');
-  fsNavbarMenuButton.addEventListener('click', animateNavLinks);
+  });
 });
