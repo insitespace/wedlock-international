@@ -2,7 +2,7 @@ window.Webflow ||= [];
 window.isMenuOpen = false;
 
 window.Webflow.push(() => {
-  // 1. SplitText Animation
+  // 1. SplitText Animation (Global)
   setTimeout(() => {
     const elements = document.querySelectorAll("[js-line-animation]");
 
@@ -57,7 +57,7 @@ window.Webflow.push(() => {
     });
   }, 700);
 
-  // 2. Nav Menu Animation (with global isMenuOpen)
+  // 2. Nav Menu Animation (Global)
   const navLinks = document.querySelectorAll('.fs-menu-link, .fs-navbar_wrap');
   const fsNavbarMenuButton = document.querySelector('.fs-navbar_menu-button');
 
@@ -92,5 +92,4 @@ window.Webflow.push(() => {
     fsNavbarMenuButton.addEventListener('click', animateNavLinks);
   }
 });
-
 
